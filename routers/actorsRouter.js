@@ -2,18 +2,24 @@ const router = require("express").Router();
 
 let data = require("../data");
 
-
 router.get("/", (req, res) => {
   res.status(200).json(data);
 });
 
 let testNextId = 4;
-router.post("/", (req, res) => {
+router.post("/", (req, res, next) => {
   let new_actor = req.body;
-  new_actor.id = testNextId;
-  testNextId++;
-  data.push(new_actor);
-  res.status(201).json(new_actor);
+  if (!new_actor.name || !new_actor.films) {
+    next({
+      statusCode: 400,
+      errorMessage: "You must use 'name' and 'films' to add new actor!",
+    });
+  } else {
+    new_actor.id = testNextId;
+    testNextId++;
+    data.push(new_actor);
+    res.status(201).json(new_actor);
+  }
 });
 
 router.put("/:id", (req, res) => {
